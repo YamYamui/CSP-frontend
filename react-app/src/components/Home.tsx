@@ -12,15 +12,44 @@ interface FormData {
   pax: number;
   month: string;
   personData: number[][];
-  agreed: boolean;
+  consecutive: boolean;
+  covers: CoverData[];
+}
+
+interface CoverData {
+  name: string;
+  start: number;
+  end: number;
 }
 
 function Home({ onFormSubmit }: homeProps) {
   // State hooks
-  const [agreed, setAgreed] = useState(false);
+  const [consecutive, setconsecutive] = useState(false);
   const [pax, setPax] = useState(0);
   const [month, setMonth] = useState("");
   const [personData, setPersonData] = useState<number[][]>([]);
+  const [covers, setCovers] = useState<CoverData[]>([]);
+
+  // Add a new cover
+  const addCover = () => {
+    setCovers([...covers, { name: "", start: 0, end: 0 }]);
+  };
+
+  // Remove a cover
+  const removeCover = (index: number) => {
+    setCovers(covers.filter((_, i) => i !== index));
+  };
+
+  // Handle cover input change
+  const handleCoverChange = (
+    index: number,
+    field: keyof CoverData,
+    value: string | number
+  ) => {
+    const updatedCovers = [...covers];
+    updatedCovers[index] = { ...updatedCovers[index], [field]: value };
+    setCovers(updatedCovers);
+  };
 
   // Event handlers
   const handlePaxChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -53,19 +82,19 @@ function Home({ onFormSubmit }: homeProps) {
       pax,
       month,
       personData,
-      agreed,
+      consecutive,
+      covers,
     };
-
+    console.log(formData);
     // Call the onFormSubmit function passed as a prop
     onFormSubmit(formData);
   };
 
   return (
-    <div className="isolate bg-white px-6 py-24 sm:py-32 lg:px-8">
+    <div className="isolate bg-white px-6 py-1 sm:py-32 lg:px-8">
       <div
         aria-hidden="true"
         className="absolute inset-x-0 top-[-10rem] -z-10 transform-gpu overflow-hidden blur-3xl sm:top-[-20rem]"
-
       >
         <div
           style={{
@@ -75,19 +104,11 @@ function Home({ onFormSubmit }: homeProps) {
           className="relative left-1/2 -z-10 aspect-[1155/678] w-[36.125rem] max-w-none -translate-x-1/2 rotate-[30deg] bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] opacity-30 sm:left-[calc(50%-40rem)] sm:w-[72.1875rem]"
         />
       </div>
-      <div className="mx-auto  max-w-2xl text-center shadow-inner bg-transparent ">
-        <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          Duty Scheduler
-        </h2>
-        <p className="mt-2 text-lg leading-8 text-gray-600">
-          AI powered duty roster generation v1.0
-        </p>
-      </div>
       <form
         onSubmit={handleFormSubmit}
         action="#"
         method="POST"
-        className="mx-auto mt-5 max-w-xl sm:mt-20"
+        className="mx-auto mt-4 max-w-xl sm:mt-20"
       >
         <div className="grid grid-cols-1 gap-x-4 gap-y-1 sm:grid-cols-2">
           <div>
@@ -153,26 +174,65 @@ function Home({ onFormSubmit }: homeProps) {
               ))}
           </div>
 
-          <Field className="flex gap-x-4 sm:col-span-2">
-            <div className="flex h-6 items-center">
-              <Switch
-                checked={agreed}
-                onChange={setAgreed}
-                className="group flex w-8 flex-none cursor-pointer rounded-full bg-gray-200 p-px ring-1 ring-inset ring-gray-900/5 transition-colors duration-200 ease-in-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 data-[checked]:bg-indigo-600"
-              >
-                <span className="sr-only">Agree to policies</span>
-                <span
-                  aria-hidden="true"
-                  className="h-4 w-4 transform rounded-full bg-white shadow-sm ring-1 ring-gray-900/5 transition duration-200 ease-in-out group-data-[checked]:translate-x-3.5"
-                />
-              </Switch>
+          {/* Add cover button */}
+          <div className="sm:col-span-2 mt-4">
+            <button
+              type="button"
+              onClick={addCover}
+              className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+            >
+              Add Cover
+            </button>
+          </div>
+
+          {/* Cover input fields */}
+          {covers.map((cover, index) => (
+            <div
+              key={index}
+              className="grid grid-cols-3 gap-x-4 sm:col-span-2 mt-2"
+            >
+              <input
+                type="text"
+                placeholder="Cover Name"
+                value={cover.name}
+                onChange={(e) =>
+                  handleCoverChange(index, "name", e.target.value)
+                }
+                className="rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300"
+              />
+              <input
+                type="number"
+                placeholder="Start Day"
+                value={cover.start}
+                onChange={(e) =>
+                  handleCoverChange(index, "start", Number(e.target.value))
+                }
+                className="rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300"
+              />
+              <input
+                type="number"
+                placeholder="End Day"
+                value={cover.end}
+                onChange={(e) =>
+                  handleCoverChange(index, "end", Number(e.target.value))
+                }
+                className="rounded-md border-0 px-3.5 py-2 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300"
+              />
+              <div className="grid grid-cols-subgrid gap-x-4 col-span-3">
+                <div className="col-start-3">
+                  <button
+                    type="button"
+                    onClick={() => removeCover(index)}
+                    className="bg-red-500 text-white rounded px-3.5 mt-2"
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
             </div>
-            <Label className="text-sm leading-6 text-gray-600">
-              Consecutive duties bias
-            </Label>
-          </Field>
+          ))}
         </div>
-        <div className="mt-10">
+        <div className="mt-3">
           <button
             type="submit"
             className="block w-full rounded-md bg-indigo-600 px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
@@ -180,6 +240,25 @@ function Home({ onFormSubmit }: homeProps) {
             Generate
           </button>
         </div>
+
+        <Field className="flex gap-x-4 sm:col-span-2">
+          <div className="flex h-6 items-center">
+            <Switch
+              checked={consecutive}
+              onChange={setconsecutive}
+              className="group flex w-8 flex-none cursor-pointer rounded-full bg-gray-200 p-px ring-1 ring-inset ring-gray-900/5 transition-colors duration-200 ease-in-out focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 data-[checked]:bg-indigo-600"
+            >
+              <span className="sr-only">Agree to policies</span>
+              <span
+                aria-hidden="true"
+                className="h-4 w-4 transform rounded-full bg-white shadow-sm ring-1 ring-gray-900/5 transition duration-200 ease-in-out group-data-[checked]:translate-x-3.5"
+              />
+            </Switch>
+          </div>
+          <Label className="text-sm leading-6 text-gray-600">
+            Consecutive duties bias
+          </Label>
+        </Field>
       </form>
     </div>
   );

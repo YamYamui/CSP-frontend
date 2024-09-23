@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 type ScheduleData = {
   [key: string]: string[];
@@ -9,7 +9,9 @@ interface ScoreTablePropsProps {
 }
 
 const ScoreTableProps: React.FC<ScoreTablePropsProps> = ({ scheduleData }) => {
-  const days = Object.keys(scheduleData).sort((a, b) => parseInt(a) - parseInt(b));
+  const days = Object.keys(scheduleData).sort(
+    (a, b) => parseInt(a) - parseInt(b)
+  );
   const people = Array.from(new Set(Object.values(scheduleData).flat())).sort();
 
   // Function to calculate duty points for a person
@@ -24,17 +26,24 @@ const ScoreTableProps: React.FC<ScoreTablePropsProps> = ({ scheduleData }) => {
 
   return (
     <div className="overflow-x-auto mt-4">
-      <table className="w-1/2 mx-auto bg-white border border-gray-300 text-sm"> {/* Reduced width and font size */}
+      <table className="w-1/10 mx-auto bg-white border border-gray-300 text-sm ">
+        {" "}
+        {/* Reduced width and font size */}
         <thead>
           <tr className="bg-gray-100">
-            <th className="px-2 py-1 border-b border-r">Person</th> {/* Reduced padding */}
-            <th className="px-2 py-1 border-b border-r">Duty Points</th> {/* Reduced padding */}
+            <th className="px-2 py-1 border-b border-r">Person</th>{" "}
+            {/* Reduced padding */}
+            <th className="px-2 py-1 border-b border-r">Duty Points</th>{" "}
+            {/* Reduced padding */}
           </tr>
         </thead>
         <tbody>
           {people.map((person) => (
             <tr key={person}>
-              <td className="px-2 py-1 border-b border-r font-bold">{person}</td> {/* Reduced padding */}
+              <td className="px-2 py-1 border-b border-r font-bold">
+                {person}
+              </td>{" "}
+              {/* Reduced padding */}
               <td className="px-2 py-1 border-b border-r text-center">
                 {calculateDutyPoints(person)} {/* Display total duty points */}
               </td>
