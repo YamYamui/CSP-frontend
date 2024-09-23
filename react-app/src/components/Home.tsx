@@ -53,7 +53,10 @@ function Home({ onFormSubmit }: homeProps) {
 
   // Event handlers
   const handlePaxChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(event.target.value, 10) || 0;
+    let value = parseInt(event.target.value, 10) || 0;
+    if (value < 0) {
+      value = 0;
+    }
     setPax(value);
     setPersonData(Array(value).fill([]));
   };
